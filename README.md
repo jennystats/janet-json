@@ -73,7 +73,7 @@ go.
 - **[janet-json](https://github.com/jennystats/janet-json)** (this module)
   differs from the above in deterministic encoding (sorted keys,
   shortest round-trip floats, full UTF-8), positioned error messages,
-  and a conformance suite cross-validated against spork's C decoder.
+  and a test suite with byte-exact encode pins.
 
 ## Install
 
@@ -103,12 +103,16 @@ jpm install https://github.com/jennystats/janet-json
 
 ## Tests
 
-Run from the repo root; the test uses a module-relative import and needs
+Run from the repo root; the tests use module-relative imports and need
 no setup.
 
 ```bash
 janet test/smoke-json.janet
+janet test/float-encode-cases.janet
 ```
+
+`test/bench-encode.janet` measures number-encode cost by value class
+(min of 5 timed runs); it is a benchmark, not a test.
 
 ## License
 

@@ -191,13 +191,35 @@
   (buffer/push-string acc "\"")
   (string acc))
 
-(defn- enc-float-body [x]
-  # shortest form that round-trips
+(defn- enc-float-loop [x]
+  # shortest form that round-trips, by ascending precision
   (var out nil)
   (loop [prec :range [1 18] :until out]
     (def s (string/format (string "%." prec "g") x))
     (when (= (scan-number s) x) (set out s)))
   (or out (string/format "%.17g" x)))
+
+(defn- enc-float-body [x]
+  # shortest form that round-trips, without the ascending loop's k
+  # format+scan passes. From 1e-309 up through the largest double, the
+  # 15-significant-digit decimal spacing stays above the double ulp, so
+  # at most one 15-digit decimal round-trips to x: whenever a minimal
+  # form exists at <= 15 digits, %.15g (%g strips trailing zeros) is
+  # byte-identical to it. Try 15, then 16, then 17 (17 digits always
+  # round-trip a double): one pass for typical data, three for a full-
+  # mantissa double. string/format and scan-number must round exactly -
+  # test/float-encode-cases.janet pins that. Below 1e-309 the subnormal
+  # ulp is wider than the spacing and the cascade can overshoot the
+  # shortest form, so that rare tail keeps the loop.
+  (if (< (math/abs x) 1e-309)
+    (enc-float-loop x)
+    (let [s15 (string/format "%.15g" x)]
+      (if (= (scan-number s15) x)
+        s15
+        (let [s16 (string/format "%.16g" x)]
+          (if (= (scan-number s16) x)
+            s16
+            (string/format "%.17g" x)))))))
 
 (defn- enc-number-body [x]
   (cond
