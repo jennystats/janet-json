@@ -200,17 +200,10 @@
   (or out (string/format "%.17g" x)))
 
 (defn- enc-float-body [x]
-  # shortest form that round-trips, without the ascending loop's k
-  # format+scan passes. From 1e-309 up through the largest double, the
-  # 15-significant-digit decimal spacing stays above the double ulp, so
-  # at most one 15-digit decimal round-trips to x: whenever a minimal
-  # form exists at <= 15 digits, %.15g (%g strips trailing zeros) is
-  # byte-identical to it. Try 15, then 16, then 17 (17 digits always
-  # round-trip a double): one pass for typical data, three for a full-
-  # mantissa double. string/format and scan-number must round exactly -
-  # test/float-encode-cases.janet pins that. Below 1e-309 the subnormal
-  # ulp is wider than the spacing and the cascade can overshoot the
-  # shortest form, so that rare tail keeps the loop.
+  # shortest round-trip form: %.15g first, then %.16g, %.17g - %g strips
+  # trailing zeros and 17 digits always round-trip a double, so one pass
+  # covers typical data. Subnormal tail (<1e-309): the ulp outgrows the
+  # 15-digit decimal spacing there, so that rare range keeps the loop.
   (if (< (math/abs x) 1e-309)
     (enc-float-loop x)
     (let [s15 (string/format "%.15g" x)]
