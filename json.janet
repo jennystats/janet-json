@@ -1,5 +1,5 @@
 # json.janet - pure-Janet JSON encode/decode, spork-compatible.
-# License: GPLv3 (see LICENSE in the package root).
+# License: AGPLv3 (see LICENSE in the package root).
 #
 # Why pure Janet (short): no native module, no C toolchain, core stdlib
 # only - runs anywhere Janet does. Full rationale in the README.

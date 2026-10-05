@@ -2,7 +2,7 @@
 (declare-project
   :name "janet-json"
   :description "Pure-Janet JSON encode/decode - spork-compatible, no native module"
-  :license "GPL-3.0"
+  :license "AGPL-3.0"
   :version "0.1.0")
 
 (declare-source

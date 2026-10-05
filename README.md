@@ -116,7 +116,7 @@ janet test/float-encode-cases.janet
 
 ## License
 
-GPLv3 - see `LICENSE`.
+AGPLv3 - see `LICENSE`.
 
 ## AI assistance
 
