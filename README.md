@@ -103,13 +103,12 @@ jpm install https://github.com/jennystats/janet-json
 
 ## Tests
 
-Run from the repo root; the tests use module-relative imports and need
-no setup.
-
 ```bash
-janet test/smoke-json.janet
-janet test/float-encode-cases.janet
+./run_tests.sh
 ```
+
+Runs the smokes from the repo root; the tests use module-relative
+imports and need no setup.
 
 `test/bench-encode.janet` measures number-encode cost by value class
 (min of 5 timed runs); it is a benchmark, not a test.
