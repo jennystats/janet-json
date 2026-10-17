@@ -11,16 +11,27 @@ Core stdlib only. Developed and tested on Janet 1.42.
 
 ## Usage
 
-```janet
-(import janet-json)
+All jenny modules install under a `jennystats/` namespace directory:
+`(import jennystats/json)` - collision-proof against bare-name
+shadowing of core symbols or other packages, by construction.
 
+```janet
+(import jennystats/json)
+ 
 (json/decode "{\"a\": [1, 2.5], \"b\": null}")
 # -> @{"a" @[1 2.5] "b" :null}
-
+ 
 (json/encode {:z 1 :a [true nil]})
 # -> "{\"a\":[true,null],\"z\":1}"
 ```
-
+ 
+Prefer a shorter call prefix? Alias at import - the form used in our
+test suite:
+ 
+```janet
+(import jennystats/json :as json)
+```
+ 
 Spork-compatible semantics, documented:
 
 - decode: object → table, array → array, string → string, true/false →
@@ -82,7 +93,7 @@ Clone anywhere, then either:
 **Import by path** - zero setup, works everywhere:
 
 ```janet
-(import "/path/to/janet-json/janet-json")
+(import "/path/to/janet-json/jennystats/json")
 ```
 
 **Or make the module importable by name** - if you keep a Janet module
@@ -90,10 +101,11 @@ directory, symlink the file into it:
 
 ```bash
 git clone https://github.com/jennystats/janet-json janet-json
-ln -s "$(pwd)/janet-json/janet-json.janet" /your/janet/module/dir
+mkdir -p /your/janet/module/dir/jennystats
+ln -s "$(pwd)/janet-json/jennystats/json.janet" /your/janet/module/dir/jennystats
 ```
 
-Then `(import janet-json)` works everywhere.
+Then `(import jennystats/json)` works everywhere.
 
 **Or with jpm** - installs into your module path:
 
