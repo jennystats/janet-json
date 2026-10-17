@@ -16,22 +16,18 @@ All jenny modules install under a `jennystats/` namespace directory:
 shadowing of core symbols or other packages, by construction.
 
 ```janet
-(import jennystats/json)
- 
+(import jennystats/json :as json)
+
 (json/decode "{\"a\": [1, 2.5], \"b\": null}")
 # -> @{"a" @[1 2.5] "b" :null}
- 
+
 (json/encode {:z 1 :a [true nil]})
 # -> "{\"a\":[true,null],\"z\":1}"
 ```
- 
-Prefer a shorter call prefix? Alias at import - the form used in our
-test suite:
- 
-```janet
-(import jennystats/json :as json)
-```
- 
+
+The `:as` alias is the form used in this repo's tests; the plain
+import gives the same call sites with the `json/` prefix.
+
 Spork-compatible semantics, documented:
 
 - decode: object → table, array → array, string → string, true/false →
