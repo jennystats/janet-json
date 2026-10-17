@@ -6,4 +6,4 @@
   :version "0.1.0")
 
 (declare-source
-  :source ["json.janet"])
+  :source ["janet-json.janet"])
