@@ -12,7 +12,7 @@ Core stdlib only. Developed and tested on Janet 1.42.
 ## Usage
 
 ```janet
-(import json)
+(import janet-json)
 
 (json/decode "{\"a\": [1, 2.5], \"b\": null}")
 # -> @{"a" @[1 2.5] "b" :null}
@@ -82,7 +82,7 @@ Clone anywhere, then either:
 **Import by path** - zero setup, works everywhere:
 
 ```janet
-(import "/path/to/janet-json/json")
+(import "/path/to/janet-json/janet-json")
 ```
 
 **Or make the module importable by name** - if you keep a Janet module
@@ -90,10 +90,10 @@ directory, symlink the file into it:
 
 ```bash
 git clone https://github.com/jennystats/janet-json janet-json
-ln -s "$(pwd)/janet-json/json.janet" /your/janet/module/dir
+ln -s "$(pwd)/janet-json/janet-json.janet" /your/janet/module/dir
 ```
 
-Then `(import json)` works everywhere.
+Then `(import janet-json)` works everywhere.
 
 **Or with jpm** - installs into your module path:
 
@@ -121,3 +121,4 @@ AGPLv3 - see `LICENSE`.
 
 The code in this repository was written with the assistance of a large
 language model and reviewed by its maintainer.
+

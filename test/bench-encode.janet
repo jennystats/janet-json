@@ -1,7 +1,7 @@
 # bench-encode.janet - number-encode cost by value class, min-of-5.
 # Run from the package root: janet test/bench-encode.janet
 # Fixtures are seeded, so runs are comparable across code versions.
-(import ../json)
+(import ../janet-json)
 
 (def n 10000)
 (math/seedrandom "json-bench")

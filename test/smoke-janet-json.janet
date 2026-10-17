@@ -1,4 +1,4 @@
-(import ../json)
+(import ../janet-json)
 
 (defn assert-eq [a b msg]
   (unless (deep= a b) (errorf "FAIL %s: %q != %q" msg a b)))
