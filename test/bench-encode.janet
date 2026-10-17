@@ -1,7 +1,7 @@
 # bench-encode.janet - number-encode cost by value class, min-of-5.
 # Run from the package root: janet test/bench-encode.janet
 # Fixtures are seeded, so runs are comparable across code versions.
-(import ../janet-json)
+(import ../jennystats/json)
 
 (def n 10000)
 (math/seedrandom "json-bench")
@@ -33,10 +33,10 @@
   best)
 
 (printf "n = %d values per fixture, min of 5 timed runs\n" n)
-(printf "%-14s %12s %12s %8s\n" "fixture" "single-pass" "janet-json/encode" "ratio")
+(printf "%-14s %12s %12s %8s\n" "fixture" "single-pass" "json/encode" "ratio")
 (each [name xs] [["decimals" decimals] ["full-mantissa" full-mantissa] ["integers" integers]]
   (def t-single (time-min5 (fn [] (single-pass xs))))
-  (def t-mod (time-min5 (fn [] (janet-json/encode xs))))
+  (def t-mod (time-min5 (fn [] (json/encode xs))))
   (printf "%-14s %10.2fms %10.2fms %7.2fx\n"
           name (* 1000 t-single) (* 1000 t-mod) (/ t-mod t-single)))
-(print "ratio = janet-json/encode vs one %.17g format per number")
+(print "ratio = json/encode vs one %.17g format per number")

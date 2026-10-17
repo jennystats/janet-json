@@ -2,10 +2,10 @@
 # encoder (json.janet enc-float-body): a %.15g/16g/17g cascade above
 # 1e-309, the ascending loop below it. Breaks if string/format or
 # scan-number rounding ever changes in the Janet core.
-(import ../janet-json)
+(import ../jennystats/json)
 
 (defn assert-bytes [x want msg]
-  (def got (janet-json/encode x))
+  (def got (json/encode x))
   (unless (= got want)
     (errorf "FAIL %s: %q != %q" msg got want))
   (unless (= (scan-number got) x)
