@@ -5,7 +5,7 @@
 (import ../janet-json)
 
 (defn assert-bytes [x want msg]
-  (def got (json/encode x))
+  (def got (janet-json/encode x))
   (unless (= got want)
     (errorf "FAIL %s: %q != %q" msg got want))
   (unless (= (scan-number got) x)
