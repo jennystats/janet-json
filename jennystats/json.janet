@@ -37,6 +37,11 @@
                        (bor 0x80 (band (brshift cp 6) 0x3F))
                        (bor 0x80 (band cp 0x3F)))))
 
+(defn- non-finite? [x]
+  # numeric, not identity: a decoded overflow compares equal to an infinite
+  # double without being the math/inf literal; (not= x x) is NaN only
+  (or (not= x x) (not (< (math/abs x) math/inf))))
+
 (defn- skip-ws [s i]
   (def n (length s))
   (var j i)
@@ -96,6 +101,7 @@
     (++ j))
   (def num (scan-number (string/slice s i j)))
   (when (nil? num) (errorf "json: bad number at index %d" i))
+  (when (non-finite? num) (errorf "json: number out of range at index %d" i))
   [num j])
 
 (defn- parse-object [s j pv]
@@ -163,9 +169,17 @@
     (bounded-prefix? s j "null") [:null (+ j 4)]
     (parse-number-body s j)))
 
-(defn decode [s]
-  # JSON text (string/buffer/keyword/symbol) → Janet data.
-  # Trailing garbage is an error.
+(defn decode
+  "Parse JSON text into Janet data: object to table, array to array,
+  string to string, true/false to boolean, null to :null, numbers to
+  doubles. Accepts the text as string, buffer, keyword or symbol.
+
+  Returns the parsed value. Raises on any other argument type, on
+  malformed input (bad escape, bad number, unterminated string, object
+  or array, lone or mismatched surrogate), and on trailing garbage -
+  surrounding whitespace is allowed, anything else after the value is
+  not. Duplicate object keys keep the last value."
+  [s]
   (unless (or (string? s) (buffer? s) (keyword? s) (symbol? s))
     (errorf "json/decode: expected string, buffer, keyword or symbol, got %v" (type s)))
   (def str (string s))
@@ -191,12 +205,20 @@
   (buffer/push-string acc "\"")
   (string acc))
 
+(defn- number-ok? [x s]
+  # The ONLY form rule: text is emitted when it re-scans to the same finite
+  # double. The guarantee is VALUE-level - a text that scans to a different
+  # double, or to a non-finite value, is rejected; the compare level is
+  # incidental.
+  (def back (scan-number s))
+  (and (number? back) (not (non-finite? back)) (= back x)))
+
 (defn- enc-float-loop [x]
   # shortest form that round-trips, by ascending precision
   (var out nil)
   (loop [prec :range [1 18] :until out]
     (def s (string/format (string "%." prec "g") x))
-    (when (= (scan-number s) x) (set out s)))
+    (when (number-ok? x s) (set out s)))
   (or out (string/format "%.17g" x)))
 
 (defn- enc-float-body [x]
@@ -207,19 +229,22 @@
   (if (< (math/abs x) 1e-309)
     (enc-float-loop x)
     (let [s15 (string/format "%.15g" x)]
-      (if (= (scan-number s15) x)
+      (if (number-ok? x s15)
         s15
         (let [s16 (string/format "%.16g" x)]
-          (if (= (scan-number s16) x)
+          (if (number-ok? x s16)
             s16
             (string/format "%.17g" x)))))))
 
 (defn- enc-number-body [x]
+  # one form for every number, integers included: writing an integral value
+  # through Janet's number printer drops digits from |x| 2^53 upward and
+  # overflows the double range near its top, so the text is chosen by
+  # re-scanning candidates instead
   (cond
     (not= x x) (error "json: cannot encode NaN")
     (= x math/inf) (error "json: cannot encode Infinity")
     (= x (- math/inf)) (error "json: cannot encode -Infinity")
-    (= x (math/floor x)) (string (math/trunc x))
     (enc-float-body x)))
 
 (defn- encode-body [v]
@@ -246,4 +271,16 @@
               "}"))
     (errorf "json: cannot encode %v" (type v))))
 
-(defn encode [v] (encode-body v))
+(defn encode
+  "Serialise Janet data to JSON text as a string. Strings and buffers
+  become escaped strings, booleans boolean literals, nil and :null
+  null, keywords their name as a JSON string, arrays and tuples arrays,
+  tables and structs objects, numbers their shortest round-tripping
+  form.
+
+  Returns the JSON text. Object keys must be strings or keywords and
+  are emitted sorted for deterministic output. Raises on NaN, either
+  infinity, and any other value type - JSON has no representation for
+  them. Integral doubles encode without a decimal point, so a 1.0
+  encodes as 1 and decodes back as an integer."
+  [v] (encode-body v))

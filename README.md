@@ -38,7 +38,10 @@ Spork-compatible semantics, documented:
   (integers without `.0`). NaN/Infinity error - JSON has no representation.
 
 Decode accepts string, buffer, keyword, or symbol input; trailing garbage
-is an error.
+is an error. A number literal outside the double range is refused with
+`json: number out of range`, so decoding finite JSON text never produces
+an infinity. A zero keeps its sign: `-0` and `-0.0` decode to a negative
+zero and encode back as `-0`.
 
 ## Why pure Janet?
 
@@ -77,10 +80,15 @@ go.
   string keys, arrays, `:null` (spork-compatible shapes). Errors are
   generic ("invalid JSON"). Its encode offers pretty-printing, which this
   module does not.
+- **[jayson](https://github.com/CFiggers/jayson)** (CFiggers) - a
+  pure-Janet encoder/decoder whose stated reason to exist is the same one
+  as this module's: `spork/json` is a native module, so its functions
+  cannot be marshalled into a `.jimage`. Its `null` contract differs:
+  decodes to `:json/null` and accepts that keyword as an encoder input.
 - **[janet-json](https://github.com/jennystats/janet-json)** (this module)
   differs from the above in deterministic encoding (sorted keys,
   shortest round-trip floats, full UTF-8), positioned error messages,
-  and a test suite with byte-exact encode pins.
+  and a test suite with byte-exact encode checks.
 
 ## Install
 
@@ -119,7 +127,11 @@ Runs the smokes from the repo root; the tests use module-relative
 imports and need no setup.
 
 `test/bench-encode.janet` measures number-encode cost by value class
-(min of 5 timed runs); it is a benchmark, not a test.
+(min of 5 timed runs); it is a benchmark, not a test. Each number costs
+two or three `string/format` calls and a `scan-number` re-scan, since
+the text is chosen by re-scanning rather than written once - a few times
+the cost of a single `%.17g` format, in exchange for digits that always
+read back as the same double.
 
 ## License
 

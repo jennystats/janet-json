@@ -1,4 +1,4 @@
-# float-encode-cases.janet - byte-exact regression pins for the number
+# float-encode-cases.janet - byte-exact regression checks for the number
 # encoder (json.janet enc-float-body): a %.15g/16g/17g cascade above
 # 1e-309, the ascending loop below it. Breaks if string/format or
 # scan-number rounding ever changes in the Janet core.
