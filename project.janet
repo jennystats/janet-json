@@ -3,7 +3,7 @@
   :name "janet-json"
   :description "Pure-Janet JSON encode/decode - spork-compatible, no native module"
   :license "AGPL-3.0"
-  :version "0.1.3")
+  :version "0.1.4")
 
 (declare-source
   :source ["jennystats"])
