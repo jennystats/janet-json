@@ -7,7 +7,7 @@ Janet binaries where the usual native-module route has pitfalls.
 Part of [Jenny Stats](https://github.com/jennystats), a home for Janet
 data and statistics packages. Jenny is just Janet.
 
-Core stdlib only. Developed and tested on Janet 1.42.
+Core stdlib only. Developed and tested on Janet 1.43.
 
 ## Usage
 
